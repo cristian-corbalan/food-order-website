@@ -1,23 +1,19 @@
 import Header from './components/Header.jsx';
 import Meals from './components/Meals.jsx';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { fetchMeals } from './services/https.js';
 import CartContextProvider from './store/cart-context.jsx';
 import Modal from './components/Modal.jsx';
 import Cart from './components/Cart.jsx';
 import Checkout from './components/Checkout.jsx';
+import useFetch from './hooks/useFetch.js';
+import Error from './components/Error.jsx';
 
 function App () {
-  const [meals, setMeals] = useState([]);
+  const { isFetching: mealsIsFetching, error: mealsError, fetchData: meals } = useFetch([], fetchMeals);
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [checkoutIsOpen, setCheckoutIsOpen] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const meals = await fetchMeals();
-      setMeals(meals);
-    })();
-  }, []);
 
   const handleOpenCart = useCallback(function handleOpenCart () {
     setModalIsOpen(true);
@@ -47,7 +43,9 @@ function App () {
       )}
 
       <Header onOpenCart={handleOpenCart}/>
-      <Meals meals={meals}/>
+
+      {mealsError.message && <Error title="Ups, something was wrong" message="Could not fetch our meals, try again later" />}
+      {!mealsError.message && <Meals meals={meals} isLoading={mealsIsFetching}/>}
     </CartContextProvider>
   );
 }
