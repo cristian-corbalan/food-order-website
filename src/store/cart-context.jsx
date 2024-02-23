@@ -2,16 +2,18 @@ import { createContext, useReducer } from 'react';
 
 export const CartContext = createContext({
   cartItems: [],
+  lastOrder: [],
   addItemToCart: () => {},
   getCartQuantity: () => {},
   getCartTotal: () => {},
   getCartItems: () => {},
-  resetCart: () => {}
+  resetCart: () => {},
+  saveOrder: () => {}
 });
 
 function cartReducer (state, action) {
   if (action.type === 'ADD_ITEM') {
-    const updatedItems = [...state];
+    const updatedItems = [...state.items];
     const existingCartItemIndex = updatedItems.findIndex(item => item.id === action.payload);
     const existingCartItem = updatedItems[existingCartItemIndex];
 
@@ -27,13 +29,13 @@ function cartReducer (state, action) {
       });
     }
 
-    return updatedItems;
+    return { ...state, items: updatedItems };
   }
 
   if (action.type === 'UPDATE_QUANTITY') {
     const { id, amount } = action.payload;
 
-    const updatedItems = [...state];
+    const updatedItems = [...state.items];
     const updatedItemIndex = updatedItems.findIndex(item => item.id === id);
     const updatedItem = { ...updatedItems[updatedItemIndex] };
 
@@ -45,16 +47,20 @@ function cartReducer (state, action) {
       updatedItems[updatedItemIndex] = updatedItem;
     }
 
-    return updatedItems;
+    return { ...state, items: updatedItems };
   }
 
   if (action.type === 'RESET') {
-    return [];
+    return { ...state, items: [] };
+  }
+
+  if (action.type === 'SAVE_ORDER') {
+    return { ...state, lastOrder: action.payload };
   }
 }
 
 export default function CartContextProvider ({ children, meals }) {
-  const [cartState, cartDispatch] = useReducer(cartReducer, []);
+  const [cartState, cartDispatch] = useReducer(cartReducer, { items: [], lastOrder: [] });
 
   function handleAddItemToCart (id) {
     cartDispatch({
@@ -77,20 +83,20 @@ export default function CartContextProvider ({ children, meals }) {
   }
 
   function getTotal () {
-    return cartState.reduce((total, item) => {
+    return cartState.items.reduce((total, item) => {
       const meal = meals.find(meal => meal.id === item.id);
       return total + (meal.price * item.quantity);
     }, 0);
   }
 
   function getQuantity () {
-    return cartState.reduce((total, item) => {
+    return cartState.items.reduce((total, item) => {
       return total + item.quantity;
     }, 0);
   }
 
   function getItems () {
-    return cartState.map(item => {
+    return cartState.items.map(item => {
       const { name, price } = meals.find(meal => meal.id === item.id);
       return {
         name,
@@ -101,14 +107,23 @@ export default function CartContextProvider ({ children, meals }) {
     });
   }
 
+  function setOrder (order) {
+    cartDispatch({
+      type: 'SAVE_ORDER',
+      payload: order
+    });
+  }
+
   const defaultContext = {
-    cartItems: cartState,
+    cartItems: cartState.items,
+    lastOrder: cartState.lastOrder,
     addItemToCart: handleAddItemToCart,
     updateCartItemQuantity: handleUpdateCartItemQuantity,
     resetCart: handleResetCart,
     getCartTotal: getTotal,
     getCartQuantity: getQuantity,
-    getCartItems: getItems
+    getCartItems: getItems,
+    saveOrder: setOrder
   };
 
   return (
