@@ -4,7 +4,7 @@ import Loader from './Loader.jsx';
 export default function Meals ({ meals, isLoading }) {
   return (
     <main>
-      <h2>Our meals</h2>
+      <h2 className="sr-only">Our meals</h2>
       {isLoading && <Loader/>}
       {!isLoading && (
         <ul id="meals">
