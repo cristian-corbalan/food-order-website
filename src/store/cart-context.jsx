@@ -28,16 +28,41 @@ function cartReducer (state, action) {
     }
   }
 
+  if (action.type === 'UPDATE_QUANTITY') {
+    const { id, amount } = action.payload;
+
+    const updatedItems = [...state];
+    const updatedItemIndex = updatedItems.findIndex(item => item.id === id);
+    const updatedItem = { ...updatedItems[updatedItemIndex] };
+
+    updatedItem.quantity += amount;
+
+    if (updatedItem.quantity === 0) {
+      updatedItems.splice(updatedItemIndex, 1);
+    } else {
+      updatedItems[updatedItemIndex] = updatedItem;
+    }
+
+    return updatedItems;
+  }
+
   return updatedItems;
 }
 
 export default function CartContextProvider ({ children, meals }) {
   const [cartState, cartDispatch] = useReducer(cartReducer, []);
 
-  function handleAddToCart (id) {
+  function handleAddItemToCart (id) {
     cartDispatch({
       type: 'ADD_ITEM',
       payload: id
+    });
+  }
+
+  function handleUpdateCartItemQuantity (id, amount) {
+    cartDispatch({
+      type: 'UPDATE_QUANTITY',
+      payload: { id, amount }
     });
   }
 
@@ -56,7 +81,8 @@ export default function CartContextProvider ({ children, meals }) {
 
   const defaultContext = {
     cartItems: cartState,
-    addItemToCart: handleAddToCart,
+    addItemToCart: handleAddItemToCart,
+    updateCartItemQuantity: handleUpdateCartItemQuantity,
     getCartTotal: getTotal,
     getCartQuantity: getQuantity
   };
