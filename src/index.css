@@ -204,6 +204,23 @@ h1 {
   gap: 1rem;
 }
 
+.error{
+  background-color: #ffc404;
+  border-radius: 6px;
+  border: none;
+  padding: 1rem;
+  width: 80%;
+  max-width: 40rem;
+  color: #1f1a09;
+  margin: auto;
+}
+
+.error-title{
+  font-size: 1.5rem;
+  font-weight: bold;
+
+}
+
 .button {
   font: inherit;
   cursor: pointer;
