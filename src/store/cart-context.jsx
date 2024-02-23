@@ -2,7 +2,9 @@ import { createContext, useReducer } from 'react';
 
 export const CartContext = createContext({
   cartItems: [],
-  addItemToCart: () => {}
+  addItemToCart: () => {},
+  getCartQuantity: () => {},
+  getCartTotal: () => {}
 });
 
 function cartReducer (state, action) {
@@ -26,11 +28,10 @@ function cartReducer (state, action) {
     }
   }
 
-  console.log(updatedItems);
   return updatedItems;
 }
 
-export default function CartContextProvider ({ children }) {
+export default function CartContextProvider ({ children, meals }) {
   const [cartState, cartDispatch] = useReducer(cartReducer, []);
 
   function handleAddToCart (id) {
@@ -40,9 +41,24 @@ export default function CartContextProvider ({ children }) {
     });
   }
 
+  function getTotal () {
+    return cartState.reduce((total, item) => {
+      const meal = meals.find(meal => meal.id === item.id);
+      return total + (meal.price * item.quantity);
+    }, 0);
+  }
+
+  function getQuantity () {
+    return cartState.reduce((total, item) => {
+      return total + item.quantity;
+    }, 0);
+  }
+
   const defaultContext = {
     cartItems: cartState,
-    addItemToCart: handleAddToCart
+    addItemToCart: handleAddToCart,
+    getCartTotal: getTotal,
+    getCartQuantity: getQuantity
   };
 
   return (
