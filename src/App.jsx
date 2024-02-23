@@ -36,7 +36,7 @@ function App () {
     <CartContextProvider meals={meals}>
       {modalIsOpen && !checkoutIsOpen && (
         <Modal open={modalIsOpen} onClose={handleCloseCart}>
-            <Cart meals={meals} onCloseModal={handleCloseCart} onOpenCheckout={handleOpenCheckout}/>
+            <Cart onCloseModal={handleCloseCart} onOpenCheckout={handleOpenCheckout}/>
         </Modal>
       )}
 

@@ -4,7 +4,8 @@ export const CartContext = createContext({
   cartItems: [],
   addItemToCart: () => {},
   getCartQuantity: () => {},
-  getCartTotal: () => {}
+  getCartTotal: () => {},
+  getCartItems: () => {}
 });
 
 function cartReducer (state, action) {
@@ -77,12 +78,25 @@ export default function CartContextProvider ({ children, meals }) {
     }, 0);
   }
 
+  function getItems () {
+    return cartState.map(item => {
+      const { name, price } = meals.find(meal => meal.id === item.id);
+      return {
+        name,
+        price,
+        id: item.id,
+        quantity: item.quantity
+      };
+    });
+  }
+
   const defaultContext = {
     cartItems: cartState,
     addItemToCart: handleAddItemToCart,
     updateCartItemQuantity: handleUpdateCartItemQuantity,
     getCartTotal: getTotal,
-    getCartQuantity: getQuantity
+    getCartQuantity: getQuantity,
+    getCartItems: getItems
   };
 
   return (
