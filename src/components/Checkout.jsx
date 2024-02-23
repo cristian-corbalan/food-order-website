@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { CartContext } from '../store/cart-context.jsx';
 import Input from './Input.jsx';
 import useInput from '../hooks/useInput.js';
@@ -7,6 +7,10 @@ import { sendOrder } from '../services/https.js';
 
 export default function Checkout ({ onCloseModal }) {
   const { getCartTotal, getCartItems } = useContext(CartContext);
+
+  const [sendError, setSendError] = useState({ message: '' });
+  const [isSending, setIsSending] = useState(false);
+
   const {
     value: nameValue,
     InputError: nameHasError,
@@ -60,15 +64,24 @@ export default function Checkout ({ onCloseModal }) {
       }
     };
 
-    const data = await sendOrder(order);
+    setSendError({ message: '' });
 
-    console.log(data);
+    setIsSending(true);
+    try {
+      const { message } = await sendOrder(order);
+    } catch (e) {
+      setSendError({ message: 'The order could not be sent, please try again later.' });
+    }
+
+    setIsSending(false);
   }
 
   return (
     <div>
+
       <h2>Checkout</h2>
       <p>Total amount: ${getCartTotal()}</p>
+
       <form action="#" onSubmit={handleFormSubmit}>
         <Input
           label="Full name"
@@ -124,9 +137,14 @@ export default function Checkout ({ onCloseModal }) {
         </div>
         <div className="modal-actions">
           <button type="button" className="text-button" onClick={onCloseModal}>Close</button>
-          <button className="button">Submit Order</button>
+          <button className="button" disabled={isSending}>Submit Order</button>
         </div>
       </form>
+      {sendError.message && (
+        <div className="modal-actions">
+         <p className="modal-error-text">{sendError.message}</p>
+        </div>
+      )}
     </div>
   );
 }
