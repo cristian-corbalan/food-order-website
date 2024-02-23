@@ -8,12 +8,10 @@ export const CartContext = createContext({
 });
 
 function cartReducer (state, action) {
-  const updatedItems = [...state];
-
   if (action.type === 'ADD_ITEM') {
-    const existingCartItemIndex = state.findIndex(item => item.id === action.payload);
-    const existingCartItem = state[existingCartItemIndex];
-    console.log('=>(cart-context.jsx:14) existingCartItem', existingCartItem);
+    const updatedItems = [...state];
+    const existingCartItemIndex = updatedItems.findIndex(item => item.id === action.payload);
+    const existingCartItem = updatedItems[existingCartItemIndex];
 
     if (existingCartItem) {
       updatedItems[existingCartItemIndex] = {
@@ -26,6 +24,8 @@ function cartReducer (state, action) {
         quantity: 1
       });
     }
+
+    return updatedItems;
   }
 
   if (action.type === 'UPDATE_QUANTITY') {
@@ -45,8 +45,6 @@ function cartReducer (state, action) {
 
     return updatedItems;
   }
-
-  return updatedItems;
 }
 
 export default function CartContextProvider ({ children, meals }) {
