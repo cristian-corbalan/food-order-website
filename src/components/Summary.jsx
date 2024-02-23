@@ -2,7 +2,12 @@ import { useContext } from 'react';
 import { CartContext } from '../store/cart-context.jsx';
 
 export default function Summary ({ onCloseModal }) {
-  const { getCartItems, getCartTotal } = useContext(CartContext);
+  const { getCartItems, getCartTotal, resetCart } = useContext(CartContext);
+
+  function handleConfirmPurchase () {
+    onCloseModal();
+    resetCart();
+  }
 
   return (
     <div className="summary">
@@ -13,7 +18,7 @@ export default function Summary ({ onCloseModal }) {
       </ul>
       <p className="summary-total">Total amount: ${getCartTotal()}</p>
       <div className="modal-actions">
-        <button className="button" onClick={onCloseModal}>Confirm</button>
+        <button className="button" onClick={handleConfirmPurchase}>Confirm</button>
       </div>
     </div>
   );

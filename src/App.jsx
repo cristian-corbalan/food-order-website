@@ -1,6 +1,6 @@
 import Header from './components/Header.jsx';
 import Meals from './components/Meals.jsx';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { fetchMeals } from './services/https.js';
 import CartContextProvider from './store/cart-context.jsx';
 import Modal from './components/Modal.jsx';
@@ -8,41 +8,45 @@ import Cart from './components/Cart.jsx';
 import Checkout from './components/Checkout.jsx';
 import useFetch from './hooks/useFetch.js';
 import Error from './components/Error.jsx';
+import Summary from './components/Summary.jsx';
 
 function App () {
   const { isFetching: mealsIsFetching, error: mealsError, fetchData: meals } = useFetch([], fetchMeals);
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [checkoutIsOpen, setCheckoutIsOpen] = useState(false);
+  const [modal, setModal] = useState({
+    isOpen: false,
+    modalToShow: 'cart'
+  });
 
-  const handleOpenCart = useCallback(function handleOpenCart () {
-    setModalIsOpen(true);
-  }, []);
+  function handleOpenModal (modalToShow) {
+    setModal({ isOpen: true, modalToShow });
+  }
 
-  const handleCloseCart = useCallback(function () {
-    setModalIsOpen(false);
-    setCheckoutIsOpen(false);
-  }, []);
-
-  const handleOpenCheckout = useCallback(function () {
-    setCheckoutIsOpen(true);
-  }, []);
+  function handleCloseModal () {
+    setModal({ isOpen: false, modalToShow: 'cart' });
+  }
 
   return (
     <CartContextProvider meals={meals}>
-      {modalIsOpen && !checkoutIsOpen && (
-        <Modal open={modalIsOpen} onClose={handleCloseCart}>
-            <Cart onCloseModal={handleCloseCart} onOpenCheckout={handleOpenCheckout}/>
+      {modal.isOpen && modal.modalToShow === 'cart' && (
+        <Modal open={modal.isOpen} onClose={handleCloseModal}>
+            <Cart onCloseModal={handleCloseModal} onOpenCheckout={() => handleOpenModal('checkout')}/>
         </Modal>
       )}
 
-      {modalIsOpen && checkoutIsOpen && (
-        <Modal open={modalIsOpen} onClose={handleCloseCart}>
-            <Checkout onCloseModal={handleCloseCart}/>
+      {modal.isOpen && modal.modalToShow === 'checkout' && (
+        <Modal open={modal.isOpen} onClose={handleCloseModal}>
+            <Checkout onCloseModal={handleCloseModal} onShowSummary={() => handleOpenModal('summary')}/>
         </Modal>
       )}
 
-      <Header onOpenCart={handleOpenCart}/>
+      {modal.isOpen && modal.modalToShow === 'summary' && (
+        <Modal open={modal.isOpen} onClose={handleCloseModal}>
+          <Summary onCloseModal={handleCloseModal}/>
+        </Modal>
+      )}
+
+      <Header onOpenCart={() => handleOpenModal('cart')}/>
 
       {mealsError.message && <Error title="Ups, something was wrong" message="Could not fetch our meals, try again later" />}
       {!mealsError.message && <Meals meals={meals} isLoading={mealsIsFetching}/>}

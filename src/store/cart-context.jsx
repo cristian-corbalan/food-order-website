@@ -5,7 +5,8 @@ export const CartContext = createContext({
   addItemToCart: () => {},
   getCartQuantity: () => {},
   getCartTotal: () => {},
-  getCartItems: () => {}
+  getCartItems: () => {},
+  resetCart: () => {}
 });
 
 function cartReducer (state, action) {
@@ -46,6 +47,10 @@ function cartReducer (state, action) {
 
     return updatedItems;
   }
+
+  if (action.type === 'RESET') {
+    return [];
+  }
 }
 
 export default function CartContextProvider ({ children, meals }) {
@@ -62,6 +67,12 @@ export default function CartContextProvider ({ children, meals }) {
     cartDispatch({
       type: 'UPDATE_QUANTITY',
       payload: { id, amount }
+    });
+  }
+
+  function handleResetCart () {
+    cartDispatch({
+      type: 'RESET'
     });
   }
 
@@ -94,6 +105,7 @@ export default function CartContextProvider ({ children, meals }) {
     cartItems: cartState,
     addItemToCart: handleAddItemToCart,
     updateCartItemQuantity: handleUpdateCartItemQuantity,
+    resetCart: handleResetCart,
     getCartTotal: getTotal,
     getCartQuantity: getQuantity,
     getCartItems: getItems

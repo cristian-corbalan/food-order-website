@@ -5,7 +5,7 @@ import useInput from '../hooks/useInput.js';
 import { hasMinLength, isEmail, isName } from '../util/validations.js';
 import { sendOrder } from '../services/https.js';
 
-export default function Checkout ({ onCloseModal }) {
+export default function Checkout ({ onCloseModal, onShowSummary }) {
   const { getCartTotal, getCartItems } = useContext(CartContext);
 
   const [sendError, setSendError] = useState({ message: '' });
@@ -69,6 +69,10 @@ export default function Checkout ({ onCloseModal }) {
     setIsSending(true);
     try {
       const { message } = await sendOrder(order);
+
+      if (message === 'Order created!') {
+        onShowSummary();
+      }
     } catch (e) {
       setSendError({ message: 'The order could not be sent, please try again later.' });
     }
