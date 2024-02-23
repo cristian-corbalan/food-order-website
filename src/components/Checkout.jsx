@@ -6,7 +6,7 @@ import { hasMinLength, isEmail, isName } from '../util/validations.js';
 import { sendOrder } from '../services/https.js';
 
 export default function Checkout ({ onCloseModal, onShowSummary }) {
-  const { getCartTotal, getCartItems } = useContext(CartContext);
+  const { getCartTotal, getCartItems, resetCart, saveOrder } = useContext(CartContext);
 
   const [sendError, setSendError] = useState({ message: '' });
   const [isSending, setIsSending] = useState(false);
@@ -71,6 +71,8 @@ export default function Checkout ({ onCloseModal, onShowSummary }) {
       const { message } = await sendOrder(order);
 
       if (message === 'Order created!') {
+        saveOrder(order.items);
+        resetCart();
         onShowSummary();
       }
     } catch (e) {
