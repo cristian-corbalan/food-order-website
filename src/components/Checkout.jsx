@@ -3,9 +3,10 @@ import { CartContext } from '../store/cart-context.jsx';
 import Input from './Input.jsx';
 import useInput from '../hooks/useInput.js';
 import { hasMinLength, isEmail, isName } from '../util/validations.js';
+import { sendOrder } from '../services/https.js';
 
 export default function Checkout ({ onCloseModal }) {
-  const { getCartTotal } = useContext(CartContext);
+  const { getCartTotal, getCartItems } = useContext(CartContext);
   const {
     value: nameValue,
     InputError: nameHasError,
@@ -41,15 +42,27 @@ export default function Checkout ({ onCloseModal }) {
     handleChange: handleCityChange
   } = useInput('', (value) => hasMinLength(value, 3));
 
-  function handleFormSubmit (event) {
+  async function handleFormSubmit (event) {
     event.preventDefault();
 
     if (nameHasError || emailHasError || streetHasError || postalCodeHasError || cityHasError) {
       return;
     }
 
-    console.log('Form data:', { nameValue, emailValue, streetValue, postalCodeValue, cityValue });
-    console.log('Fetching...');
+    const order = {
+      items: getCartItems(),
+      customer: {
+        email: emailValue,
+        name: nameValue,
+        street: streetValue,
+        'postal-code': postalCodeValue,
+        city: cityValue
+      }
+    };
+
+    const data = await sendOrder(order);
+
+    console.log(data);
   }
 
   return (
