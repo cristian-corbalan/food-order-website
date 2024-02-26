@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { CartContext } from '../store/cart-context.jsx';
 import CartItem from './CartItem.jsx';
 import { currencyFormatter } from '../util/formatting.js';
+import Button from './UI/Button.jsx';
 
 export default function Cart ({ onCloseModal, onOpenCheckout }) {
   const { getCartTotal, getCartItems } = useContext(CartContext);
@@ -15,7 +16,7 @@ export default function Cart ({ onCloseModal, onOpenCheckout }) {
         <>
           <p>The cart is empty.</p>
           <div className="modal-actions">
-            <button className="text-button" onClick={onCloseModal}>Close</button>
+            <Button onClick={onCloseModal}>Close</Button>
           </div>
         </>
       )}
@@ -32,8 +33,8 @@ export default function Cart ({ onCloseModal, onOpenCheckout }) {
           </ul>
           <p className="cart-total">{currencyFormatter.format(getCartTotal())}</p>
           <div className="modal-actions">
-            <button className="text-button" onClick={onCloseModal}>Close</button>
-            <button className="button" onClick={onOpenCheckout}>Go to Checkout</button>
+            <Button isTextOnly={true} onClick={onCloseModal}>Close</Button>
+            <Button onClick={onOpenCheckout}>Go to Checkout</Button>
           </div>
         </>
       )}

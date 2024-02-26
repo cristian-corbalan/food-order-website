@@ -5,6 +5,7 @@ import useInput from '../hooks/useInput.js';
 import { hasMinLength, isEmail, isName } from '../util/validations.js';
 import { sendOrder } from '../services/https.js';
 import { currencyFormatter } from '../util/formatting.js';
+import Button from './UI/Button.jsx';
 
 export default function Checkout ({ onCloseModal, onShowSummary }) {
   const { getCartTotal, getCartItems, resetCart, saveOrder } = useContext(CartContext);
@@ -143,8 +144,8 @@ export default function Checkout ({ onCloseModal, onShowSummary }) {
             onChange={handleCityChange}/>
         </div>
         <div className="modal-actions">
-          <button type="button" className="text-button" onClick={onCloseModal}>Close</button>
-          <button className="button" disabled={isSending}>Submit Order</button>
+          <Button type="button" isTextOnly={true} onClick={onCloseModal}>Close</Button>
+          <Button disabled={isSending}>Submit Order</Button>
         </div>
       </form>
       {sendError.message && (

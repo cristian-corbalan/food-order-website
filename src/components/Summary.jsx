@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { CartContext } from '../store/cart-context.jsx';
 import { currencyFormatter } from '../util/formatting.js';
+import Button from './UI/Button.jsx';
 
 export default function Summary ({ onCloseModal }) {
   const { lastOrder } = useContext(CartContext);
@@ -16,7 +17,7 @@ export default function Summary ({ onCloseModal }) {
       </ul>
       <p className="summary-total">Total amount: {currencyFormatter.format(total)}</p>
       <div className="modal-actions">
-        <button className="button" onClick={onCloseModal}>Confirm</button>
+        <Button onClick={onCloseModal}>Confirm</Button>
       </div>
     </div>
   );
