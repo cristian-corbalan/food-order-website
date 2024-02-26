@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { CartContext } from '../store/cart-context.jsx';
 import CartItem from './CartItem.jsx';
+import { currencyFormatter } from '../util/formatting.js';
 
 export default function Cart ({ onCloseModal, onOpenCheckout }) {
   const { getCartTotal, getCartItems } = useContext(CartContext);
@@ -29,7 +30,7 @@ export default function Cart ({ onCloseModal, onOpenCheckout }) {
               name={meal.name}
               price={meal.price}/>)}
           </ul>
-          <p className="cart-total">${getCartTotal()}</p>
+          <p className="cart-total">{currencyFormatter.format(getCartTotal())}</p>
           <div className="modal-actions">
             <button className="text-button" onClick={onCloseModal}>Close</button>
             <button className="button" onClick={onOpenCheckout}>Go to Checkout</button>

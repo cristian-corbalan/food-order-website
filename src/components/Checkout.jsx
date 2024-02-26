@@ -4,6 +4,7 @@ import Input from './Input.jsx';
 import useInput from '../hooks/useInput.js';
 import { hasMinLength, isEmail, isName } from '../util/validations.js';
 import { sendOrder } from '../services/https.js';
+import { currencyFormatter } from '../util/formatting.js';
 
 export default function Checkout ({ onCloseModal, onShowSummary }) {
   const { getCartTotal, getCartItems, resetCart, saveOrder } = useContext(CartContext);
@@ -86,7 +87,7 @@ export default function Checkout ({ onCloseModal, onShowSummary }) {
     <div>
 
       <h2>Checkout</h2>
-      <p>Total amount: ${getCartTotal()}</p>
+      <p>Total amount: {currencyFormatter.format(getCartTotal())}</p>
 
       <form action="#" onSubmit={handleFormSubmit}>
         <Input
