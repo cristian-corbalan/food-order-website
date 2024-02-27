@@ -2,14 +2,20 @@ import imgLogo from '../assets/logo.jpg';
 import { useContext, useEffect, useState } from 'react';
 import { CartContext } from '../store/cart-context.jsx';
 import Button from './UI/Button.jsx';
+import UserProgressContext from '../store/UserProgressContext.jsx';
 
 export default function Header ({ onOpenCart }) {
   const { getCartQuantity } = useContext(CartContext);
+  const { openCart } = useContext(UserProgressContext);
   const [quantity, setQuantity] = useState(0);
 
   useEffect(() => {
     setQuantity(getCartQuantity());
   }, [getCartQuantity]);
+
+  function handleOpenCart () {
+    openCart();
+  }
 
   return (
     <header id="main-header">
@@ -17,7 +23,7 @@ export default function Header ({ onOpenCart }) {
         <img src={imgLogo} alt="Food logo"/>
         <h1>React food</h1>
       </div>
-      <Button isTextOnly={true} onClick={onOpenCart}>Cart ({quantity})</Button>
+      <Button isTextOnly={true} onClick={handleOpenCart}>Cart ({quantity})</Button>
     </header>
   );
 }
