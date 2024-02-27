@@ -1,20 +1,26 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import CartContext from '../store/CartContext.jsx';
 import Input from './Input.jsx';
 import useInput from '../hooks/useInput.js';
 import { hasMinLength, isEmail, isName } from '../util/validations.js';
-import { sendOrder } from '../services/https.js';
 import { currencyFormatter } from '../util/formatting.js';
 import Button from './UI/Button.jsx';
 import Modal from './Modal.jsx';
 import UserProgressContext from '../store/UserProgressContext.jsx';
+import useHttp from '../hooks/useHttp.js';
+
+const requestConfig = {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+};
 
 export default function Checkout () {
-  const { getTotal, saveOrder, items } = useContext(CartContext);
+  const { getTotal, items } = useContext(CartContext);
   const { progress, closeCheckout, openSummary } = useContext(UserProgressContext);
 
-  const [sendError, setSendError] = useState({ message: '' });
-  const [isSending, setIsSending] = useState(false);
+  const { data, error, isLoading: isSending, sendRequest, clearData } = useHttp('http://localhost:3000/orders', requestConfig);
 
   const {
     value: nameValue,
@@ -51,6 +57,8 @@ export default function Checkout () {
     handleChange: handleCityChange
   } = useInput('', (value) => hasMinLength(value, 3));
 
+  // ----- Submit function
+
   async function handleFormSubmit (event) {
     event.preventDefault();
 
@@ -58,35 +66,40 @@ export default function Checkout () {
       return;
     }
 
-    const order = {
-      items,
-      customer: {
-        email: emailValue,
-        name: nameValue,
-        street: streetValue,
-        'postal-code': postalCodeValue,
-        city: cityValue
+    await sendRequest(JSON.stringify({
+      order: {
+        items,
+        customer: {
+          email: emailValue,
+          name: nameValue,
+          street: streetValue,
+          'postal-code': postalCodeValue,
+          city: cityValue
+        }
       }
-    };
-
-    setSendError({ message: '' });
-
-    setIsSending(true);
-    try {
-      const { message } = await sendOrder(order);
-
-      if (message === 'Order created!') {
-        openSummary();
-      }
-    } catch (e) {
-      setSendError({ message: 'The order could not be sent, please try again later.' });
-    }
-
-    setIsSending(false);
+    }));
   }
 
   function handleClose () {
     closeCheckout();
+  }
+
+  useEffect(() => {
+    if (data && !error) {
+      openSummary();
+      clearData();
+    }
+  }, [clearData, data, error, openSummary]);
+
+  let actions = (
+    <>
+      <Button type="button" isTextOnly={true} onClick={handleClose}>Close</Button>
+      <Button disabled={isSending}>Submit Order</Button>
+    </>
+  );
+
+  if (isSending) {
+    actions = <span>Sending order data...</span>;
   }
 
   return (
@@ -149,16 +162,14 @@ export default function Checkout () {
               onBlur={handleCityBlur}
               onChange={handleCityChange}/>
           </div>
+
           <div className="modal-actions">
-            <Button type="button" isTextOnly={true} onClick={handleClose}>Close</Button>
-            <Button disabled={isSending}>Submit Order</Button>
+            {actions}
           </div>
+
+          {error && <p className="modal-error-text">Failed to submit order</p>}
         </form>
-        {sendError.message && (
-          <div className="modal-actions">
-           <p className="modal-error-text">{sendError.message}</p>
-          </div>
-        )}
+
       </div>
     </Modal>
   );

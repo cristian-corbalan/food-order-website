@@ -296,6 +296,7 @@ h1 {
 .modal-error-text{
   font-weight: bold;
   color: #792828;
+  text-align: right;
 }
 
 
