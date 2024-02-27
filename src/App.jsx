@@ -1,7 +1,6 @@
 import Header from './components/Header.jsx';
 import Meals from './components/Meals.jsx';
 import { useState } from 'react';
-import { fetchMeals } from './services/https.js';
 import CartContextProvider from './store/cart-context.jsx';
 import Modal from './components/Modal.jsx';
 import Cart from './components/Cart.jsx';
@@ -10,9 +9,12 @@ import useHttp from './hooks/useHttp.js';
 import Error from './components/Error.jsx';
 import Summary from './components/Summary.jsx';
 
-function App () {
-  const { isFetching: mealsIsFetching, error: mealsError, fetchData: meals } = useHttp([], fetchMeals);
+const httpConfig = {};
 
+function App () {
+  const { data: meals, error, isLoading } = useHttp('http://localhost:3000/meals', httpConfig, []);
+
+  console.log(meals);
   const [modal, setModal] = useState({
     isOpen: false,
     modalToShow: 'cart'
@@ -48,8 +50,8 @@ function App () {
 
       <Header onOpenCart={() => handleOpenModal('cart')}/>
 
-      {mealsError.message && <Error title="Ups, something was wrong" message="Could not fetch our meals, try again later" />}
-      {!mealsError.message && <Meals meals={meals} isLoading={mealsIsFetching}/>}
+      {error.message && <Error title="Ups, something was wrong" message="Could not fetch our meals, try again later" />}
+      {!error.message && <Meals meals={meals} isLoading={isLoading}/>}
     </CartContextProvider>
   );
 }
