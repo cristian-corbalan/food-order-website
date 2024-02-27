@@ -1,6 +1,6 @@
 import { createContext, useReducer } from 'react';
 
-export const CartContext = createContext({
+const CartContext = createContext({
   cartItems: [],
   lastOrder: [],
   addItemToCart: () => {},
@@ -59,7 +59,7 @@ function cartReducer (state, action) {
   }
 }
 
-export default function CartContextProvider ({ children, meals }) {
+export function CartContextProvider ({ children, meals }) {
   const [cartState, cartDispatch] = useReducer(cartReducer, { items: [], lastOrder: [] });
 
   function handleAddItemToCart (id) {
@@ -132,3 +132,5 @@ export default function CartContextProvider ({ children, meals }) {
     </CartContext.Provider>
   );
 }
+
+export default CartContext;

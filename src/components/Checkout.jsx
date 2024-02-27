@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { CartContext } from '../store/cart-context.jsx';
+import CartContext from '../store/CartContext.jsx';
 import Input from './Input.jsx';
 import useInput from '../hooks/useInput.js';
 import { hasMinLength, isEmail, isName } from '../util/validations.js';
