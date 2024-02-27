@@ -6,12 +6,12 @@ import CartContextProvider from './store/cart-context.jsx';
 import Modal from './components/Modal.jsx';
 import Cart from './components/Cart.jsx';
 import Checkout from './components/Checkout.jsx';
-import useFetch from './hooks/useFetch.js';
+import useHttp from './hooks/useHttp.js';
 import Error from './components/Error.jsx';
 import Summary from './components/Summary.jsx';
 
 function App () {
-  const { isFetching: mealsIsFetching, error: mealsError, fetchData: meals } = useFetch([], fetchMeals);
+  const { isFetching: mealsIsFetching, error: mealsError, fetchData: meals } = useHttp([], fetchMeals);
 
   const [modal, setModal] = useState({
     isOpen: false,
