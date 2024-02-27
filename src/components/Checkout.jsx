@@ -10,7 +10,7 @@ import Modal from './Modal.jsx';
 import UserProgressContext from '../store/UserProgressContext.jsx';
 
 export default function Checkout () {
-  const { getCartTotal, getCartItems, resetCart, saveOrder } = useContext(CartContext);
+  const { getTotal, saveOrder, items } = useContext(CartContext);
   const { progress, closeCheckout, openSummary } = useContext(UserProgressContext);
 
   const [sendError, setSendError] = useState({ message: '' });
@@ -59,7 +59,7 @@ export default function Checkout () {
     }
 
     const order = {
-      items: getCartItems(),
+      items,
       customer: {
         email: emailValue,
         name: nameValue,
@@ -76,8 +76,6 @@ export default function Checkout () {
       const { message } = await sendOrder(order);
 
       if (message === 'Order created!') {
-        saveOrder(order.items);
-        resetCart();
         openSummary();
       }
     } catch (e) {
@@ -96,7 +94,7 @@ export default function Checkout () {
       <div>
 
         <h2>Checkout</h2>
-        <p>Total amount: {currencyFormatter.format(getCartTotal())}</p>
+        <p>Total amount: {currencyFormatter.format(getTotal())}</p>
 
         <form action="#" onSubmit={handleFormSubmit}>
           <Input

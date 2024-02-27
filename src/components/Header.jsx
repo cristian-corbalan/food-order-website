@@ -4,14 +4,14 @@ import CartContext from '../store/CartContext.jsx';
 import Button from './UI/Button.jsx';
 import UserProgressContext from '../store/UserProgressContext.jsx';
 
-export default function Header ({ onOpenCart }) {
-  const { getCartQuantity } = useContext(CartContext);
+export default function Header () {
+  const { getQuantity } = useContext(CartContext);
   const { openCart } = useContext(UserProgressContext);
   const [quantity, setQuantity] = useState(0);
 
   useEffect(() => {
-    setQuantity(getCartQuantity());
-  }, [getCartQuantity]);
+    setQuantity(getQuantity());
+  }, [getQuantity]);
 
   function handleOpenCart () {
     openCart();

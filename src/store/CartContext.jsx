@@ -1,30 +1,28 @@
 import { createContext, useReducer } from 'react';
 
 const CartContext = createContext({
-  cartItems: [],
-  lastOrder: [],
-  addItemToCart: () => {},
-  getCartQuantity: () => {},
-  getCartTotal: () => {},
-  getCartItems: () => {},
-  resetCart: () => {},
-  saveOrder: () => {}
+  items: [],
+  addItem: () => {},
+  removeItem: () => {},
+  getTotal: () => {},
+  getQuantity: () => {},
+  reset: () => {}
 });
 
 function cartReducer (state, action) {
   if (action.type === 'ADD_ITEM') {
     const updatedItems = [...state.items];
-    const existingCartItemIndex = updatedItems.findIndex(item => item.id === action.payload);
+    const existingCartItemIndex = updatedItems.findIndex(item => item.id === action.item.id);
     const existingCartItem = updatedItems[existingCartItemIndex];
 
     if (existingCartItem) {
       updatedItems[existingCartItemIndex] = {
         ...existingCartItem,
-        quantity: existingCartItem.quantity++
+        quantity: existingCartItem.quantity + 1
       };
     } else {
       updatedItems.push({
-        id: action.payload,
+        ...action.item,
         quantity: 1
       });
     }
@@ -32,14 +30,12 @@ function cartReducer (state, action) {
     return { ...state, items: updatedItems };
   }
 
-  if (action.type === 'UPDATE_QUANTITY') {
-    const { id, amount } = action.payload;
-
+  if (action.type === 'REMOVE_ITEM') {
     const updatedItems = [...state.items];
-    const updatedItemIndex = updatedItems.findIndex(item => item.id === id);
+    const updatedItemIndex = updatedItems.findIndex(item => item.id === action.id);
     const updatedItem = { ...updatedItems[updatedItemIndex] };
 
-    updatedItem.quantity += amount;
+    updatedItem.quantity--;
 
     if (updatedItem.quantity === 0) {
       updatedItems.splice(updatedItemIndex, 1);
@@ -50,80 +46,49 @@ function cartReducer (state, action) {
     return { ...state, items: updatedItems };
   }
 
-  if (action.type === 'RESET') {
+  if (action.type === 'RESET_CART') {
     return { ...state, items: [] };
-  }
-
-  if (action.type === 'SAVE_ORDER') {
-    return { ...state, lastOrder: action.payload };
   }
 }
 
-export function CartContextProvider ({ children, meals }) {
-  const [cartState, cartDispatch] = useReducer(cartReducer, { items: [], lastOrder: [] });
+export function CartContextProvider ({ children }) {
+  const [cartState, cartDispatch] = useReducer(cartReducer, { items: [] });
 
-  function handleAddItemToCart (id) {
+  function addItem (item) {
     cartDispatch({
       type: 'ADD_ITEM',
-      payload: id
+      item
     });
   }
 
-  function handleUpdateCartItemQuantity (id, amount) {
+  function removeItem (id) {
     cartDispatch({
-      type: 'UPDATE_QUANTITY',
-      payload: { id, amount }
+      type: 'REMOVE_ITEM',
+      id
     });
   }
 
-  function handleResetCart () {
+  function reset () {
     cartDispatch({
-      type: 'RESET'
+      type: 'RESET_CART'
     });
   }
 
   function getTotal () {
-    return cartState.items.reduce((total, item) => {
-      const meal = meals.find(meal => meal.id === item.id);
-      return total + (meal.price * item.quantity);
-    }, 0);
+    return cartState.items.reduce((total, item) => total + item.price * item.quantity, 0);
   }
 
   function getQuantity () {
-    return cartState.items.reduce((total, item) => {
-      return total + item.quantity;
-    }, 0);
-  }
-
-  function getItems () {
-    return cartState.items.map(item => {
-      const { name, price } = meals.find(meal => meal.id === item.id);
-      return {
-        name,
-        price,
-        id: item.id,
-        quantity: item.quantity
-      };
-    });
-  }
-
-  function setOrder (order) {
-    cartDispatch({
-      type: 'SAVE_ORDER',
-      payload: order
-    });
+    return cartState.items.reduce((total, item) => total + item.quantity, 0);
   }
 
   const defaultContext = {
-    cartItems: cartState.items,
-    lastOrder: cartState.lastOrder,
-    addItemToCart: handleAddItemToCart,
-    updateCartItemQuantity: handleUpdateCartItemQuantity,
-    resetCart: handleResetCart,
-    getCartTotal: getTotal,
-    getCartQuantity: getQuantity,
-    getCartItems: getItems,
-    saveOrder: setOrder
+    items: cartState.items,
+    addItem,
+    removeItem,
+    reset,
+    getTotal,
+    getQuantity
   };
 
   return (

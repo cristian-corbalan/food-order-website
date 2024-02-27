@@ -2,15 +2,15 @@ import { useContext } from 'react';
 import CartContext from '../store/CartContext.jsx';
 import { currencyFormatter } from '../util/formatting.js';
 
-export default function CartItem ({ id, quantity, name, price }) {
-  const { updateCartItemQuantity } = useContext(CartContext);
+export default function CartItem ({ item }) {
+  const { addItem, removeItem } = useContext(CartContext);
 
   return (<li className="cart-item">
-    <p>{name} - {quantity} x {currencyFormatter.format(price)}</p>
+    <p>{item.name} - {item.quantity} x {currencyFormatter.format(item.price)}</p>
     <div className="cart-item-actions">
-      <button onClick={() => updateCartItemQuantity(id, -1)}>-</button>
-      <p>{quantity}</p>
-      <button onClick={() => updateCartItemQuantity(id, 1)}>+</button>
+      <button onClick={() => removeItem(item.id)}>-</button>
+      <p>{item.quantity}</p>
+      <button onClick={() => addItem(item)}>+</button>
     </div>
   </li>);
 }

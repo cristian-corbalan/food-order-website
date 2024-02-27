@@ -6,13 +6,12 @@ import UserProgressContext from '../store/UserProgressContext.jsx';
 import Modal from './Modal.jsx';
 
 export default function Summary () {
-  const { lastOrder } = useContext(CartContext);
+  const { getTotal, items, reset } = useContext(CartContext);
   const { progress, closeSummary } = useContext(UserProgressContext);
-
-  const total = lastOrder.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   function handleClose () {
     closeSummary();
+    reset();
   }
 
   return (
@@ -21,9 +20,9 @@ export default function Summary () {
         <h2>You order was sent!!</h2>
         <h3>Summary</h3>
         <ul>
-          {lastOrder.map(item => <li key={item.id}>{item.name} - {item.quantity} x {currencyFormatter.format(item.price)}</li>)}
+          {items.map(item => <li key={item.id}>{item.name} - {item.quantity} x {currencyFormatter.format(item.price)}</li>)}
         </ul>
-        <p className="summary-total">Total amount: {currencyFormatter.format(total)}</p>
+        <p className="summary-total">Total amount: {currencyFormatter.format(getTotal())}</p>
         <div className="modal-actions">
           <Button onClick={handleClose}>Confirm</Button>
         </div>
